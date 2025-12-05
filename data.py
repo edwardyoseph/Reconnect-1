@@ -156,7 +156,7 @@ def open_roblox(pkg):
 
     # Open Roblox application with adb command
     run_adb_command(f"am start -n {pkg}/com.roblox.client.startup.ActivitySplash")
-    time.sleep(15)  # Wait for Roblox to launch
+    time.sleep(30)  # Wait for Roblox to launch
 
 # Function to update the log file using aiofiles (asynchronous I/O)
 async def update_log_file(data):
