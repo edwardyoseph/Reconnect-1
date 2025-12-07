@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LOG_FILE="/sdcard/log.txt"   # Lokasi file log
-ACT="com.delta.zinnc.startup.ActivitySplash"
+ACT="com.roblox.client.startup.ActivitySplash"
 
 while true; do
     echo "SCANNING DATA"
