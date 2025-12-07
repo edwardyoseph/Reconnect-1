@@ -3,9 +3,9 @@
 LOG_FILE="/sdcard/log.txt"   # Lokasi file log
 ACT="com.roblox.client.startup.ActivitySplash"
 
-while true; do
-    echo "SCANNING DATA"
+echo "SCANNING DATA"
 
+while true; do
     # Mengambil blok per bot dari file log
     awk -v RS="--------------------------------------------------" '
     NF > 0 {
