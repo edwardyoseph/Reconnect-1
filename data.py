@@ -170,7 +170,7 @@ async def update_log_file(data):
             await log_file.write("-" * 50 + "\n")
 
 # Find all packages related to Roblox (client)
-pkg_command = "pm list packages | grep -i 'com.delta.zinnc'"
+pkg_command = "pm list packages | grep -i 'com.roblox'"
 pkg_output = run_adb_command(pkg_command).strip()
 
 # Loop through each package and gather data
