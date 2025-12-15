@@ -172,9 +172,11 @@ async def update_log_file(data):
 # Find all packages related to Roblox (client)
 pkg_command = "pm list packages | grep -i 'com.roblox'"
 pkg_output = run_adb_command(pkg_command).strip()
+packages = [pkg.split(":")[1].strip() for pkg in pkg_output.splitlines()]
+packages_sorted = sorted(packages)
 
 # Loop through each package and gather data
-for pkg in pkg_output.splitlines():
+for pkg in packages_sorted:
     # Clean the package name
     client_pkg = pkg.split(":")[1].strip()
 
