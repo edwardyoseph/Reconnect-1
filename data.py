@@ -205,7 +205,7 @@ for client_pkg in packages_sorted:
             if username and user_id:
                 # Ambil status dari API
                 status = get_user_status(user_id)
-                print(f"Found - Username: {username}, UserId: {user_id}, Status: {status}")
+                print(f"⭐ Found - Username: {username}, UserId: {user_id}, Status: {status}")
 
                 # Simpan data ke buffer
                 data_buffer[username] = {
