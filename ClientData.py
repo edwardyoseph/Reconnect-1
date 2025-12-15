@@ -1,11 +1,13 @@
+import os
 import subprocess
 import requests
 import time
-import aiofiles
-import asyncio
 
 data_buffer = {}
 log_file_path = "/sdcard/Reconnect/log.txt"
+
+# Pastikan folder /sdcard/Reconnect/ ada
+os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
 
 # Fungsi untuk menjalankan perintah adb
 def run_adb_command(command):
@@ -46,16 +48,17 @@ def open_roblox(pkg):
     run_adb_command(f"am start -n {pkg}/com.roblox.client.startup.ActivitySplash")
     time.sleep(15)
 
-# Fungsi untuk menulis log file secara asinkron
-async def update_log_file(data):
-    async with aiofiles.open(log_file_path, 'w') as log_file:
+# Fungsi untuk menulis log file dengan cara biasa (bukan asinkron)
+def update_log_file(data):
+    with open(log_file_path, 'a') as log_file:
         for user, user_data in data.items():
-            await log_file.write(f"Username: {user_data['username']}\n")
-            await log_file.write(f"UserId: {user_data['user_id']}\n")
-            await log_file.write(f"PID: {user_data['pid']}\n")
-            await log_file.write(f"ClientName: {user_data['client_name']}\n")
-            await log_file.write(f"Status: {user_data['status']}\n")
-            await log_file.write("-" * 50 + "\n")
+            log_file.write(f"Username: {user_data['username']}\n")
+            log_file.write(f"UserId: {user_data['user_id']}\n")
+            log_file.write(f"PID: {user_data['pid']}\n")
+            log_file.write(f"ClientName: {user_data['client_name']}\n")
+            log_file.write(f"Status: {user_data['status']}\n")
+            log_file.write("-" * 50 + "\n")
+    print("Data successfully written to log.")
 
 pkg_command = "pm list packages | grep -i 'com.roblox'"
 pkg_output = run_adb_command(pkg_command).strip()
@@ -89,6 +92,7 @@ for client_pkg in packages_sorted:
             if username and user_id:
                 status = get_user_status(user_id)
                 print(f"⭐ Found - Username: {username}, UserId: {user_id}, Status: {status}")
+                # Menambahkan data ke data_buffer
                 data_buffer[username] = {
                     "username": username,
                     "user_id": user_id,
@@ -101,4 +105,11 @@ for client_pkg in packages_sorted:
     else:
         print(f"❌ Client {client_pkg} is not running.")
 
-update_log_file(data_buffer)
+# Verifikasi apakah data_buffer memiliki data yang valid sebelum menulis ke log
+if data_buffer:
+    print(f"Data buffer contains {len(data_buffer)} entries.")
+    update_log_file(data_buffer)
+else:
+    print("Data buffer is empty. No data to write.")
+
+print(f"Log file finished")
