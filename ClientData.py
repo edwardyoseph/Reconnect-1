@@ -41,7 +41,7 @@ def get_user_status(user_id):
 def open_roblox(pkg):
     print(f"⏳ Opening Roblox with package: {pkg}...")
     run_adb_command(f"am start -n {pkg}/com.roblox.client.startup.ActivitySplash")
-    time.sleep(30)
+    time.sleep(15)
     
 async def update_log_file(data):
     async with aiofiles.open(log_file_path, 'w') as log_file:
