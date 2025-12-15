@@ -176,9 +176,7 @@ packages = [pkg.split(":")[1].strip() for pkg in pkg_output.splitlines()]
 packages_sorted = sorted(packages)
 
 # Loop through each package and gather data
-for pkg in packages_sorted:
-    # Clean the package name
-    client_pkg = pkg.split(":")[1].strip()
+for client_pkg in packages_sorted:
 
     # Open Roblox and join private server
     open_roblox(client_pkg)
