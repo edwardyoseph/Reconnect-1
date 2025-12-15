@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOG_FILE="/storage/emulated/0/Reconnect/log.txt"   # Lokasi file log
+LOG_FILE="/sdcard/Reconnect/log.txt"   # Lokasi file log
 ACT="com.roblox.client.startup.ActivitySplash"
 
 while true; do
