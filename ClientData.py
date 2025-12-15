@@ -59,7 +59,7 @@ packages = [pkg.split(":")[1].strip() for pkg in pkg_output.splitlines()]
 packages_sorted = sorted(packages)
 
 for client_pkg in packages_sorted:
-    time.sleep(1)
+    time.sleep(2)
     open_roblox(client_pkg)
 
     pid_command = f"pgrep -f {client_pkg}"
