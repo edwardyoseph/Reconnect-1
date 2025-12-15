@@ -7,10 +7,12 @@ import asyncio
 data_buffer = {}
 log_file_path = "/sdcard/Reconnect/log.txt"
 
+# Fungsi untuk menjalankan perintah adb
 def run_adb_command(command):
     result = subprocess.run(f"adb shell {command}", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return result.stdout.decode("utf-8")
 
+# Fungsi untuk mengambil status pengguna
 def get_user_status(user_id):
     try:
         url = "https://presence.roblox.com/v1/presence/users"
@@ -38,11 +40,13 @@ def get_user_status(user_id):
     except Exception as e:
         return "Offline"
 
+# Fungsi untuk membuka aplikasi Roblox
 def open_roblox(pkg):
     print(f"⏳ Opening Roblox with package: {pkg}...")
     run_adb_command(f"am start -n {pkg}/com.roblox.client.startup.ActivitySplash")
     time.sleep(15)
-    
+
+# Fungsi untuk menulis log file secara asinkron
 async def update_log_file(data):
     async with aiofiles.open(log_file_path, 'w') as log_file:
         for user, user_data in data.items():
@@ -96,6 +100,12 @@ for client_pkg in packages_sorted:
             print(f"⚠️ No login data found for client with PID {pid}")
     else:
         print(f"❌ Client {client_pkg} is not running.")
-            
-asyncio.run(update_log_file(data_buffer))
-print(f"Log file Finished")
+
+# Verifikasi apakah data_buffer memiliki data yang valid
+if data_buffer:
+    print("Data buffer contains valid entries.")
+    asyncio.run(update_log_file(data_buffer))
+else:
+    print("No data to write to log.")
+
+print(f"Log file finished")
