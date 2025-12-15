@@ -177,19 +177,18 @@ packages_sorted = sorted(packages)
 
 # Loop through each package and gather data
 for client_pkg in packages_sorted:
-
-    # Open Roblox and join private server
+    # Buka Roblox
     open_roblox(client_pkg)
 
-    # Find the PID of the running client
+    # Cari PID dari client yang sudah dibuka
     pid_command = f"pgrep -f {client_pkg}"
     pid_output = run_adb_command(pid_command).strip()
 
     if pid_output:
         pid = pid_output
-        print(f"Client: {client_pkg} (PID: {pid})")
+        print(f"✅ Client: {client_pkg} (PID: {pid})")
 
-        # Use logcat to find data based on PID and extract relevant details
+        # Gunakan logcat untuk mencari data login berdasarkan PID
         logcat_command = f"logcat -d | grep -F {pid} | grep -i 'DID_LOG_IN'"
         logcat_output = run_adb_command(logcat_command)
 
@@ -204,9 +203,11 @@ for client_pkg in packages_sorted:
                     user_id = line.split('"userId":')[1].split(",")[0]
 
             if username and user_id:
+                # Ambil status dari API
                 status = get_user_status(user_id)
                 print(f"Found - Username: {username}, UserId: {user_id}, Status: {status}")
 
+                # Simpan data ke buffer
                 data_buffer[username] = {
                     "username": username,
                     "user_id": user_id,
@@ -215,11 +216,11 @@ for client_pkg in packages_sorted:
                     "status": status
                 }
         else:
-            print(f"No login data found for client with PID {pid}")
+            print(f"⚠️ No login data found for client with PID {pid}")
     else:
-        print(f"Client {client_pkg} is not running.")
+        print(f"❌ Client {client_pkg} is not running.")
 
-# Send all data to Discord webhook (in one single embed)
+# Kirim semua data ke webhook Discord dalam satu embed
 send_to_webhook(data_buffer)
 
 # Loop to check status every 5 seconds, update log file, and send updated data to log
