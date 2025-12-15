@@ -98,3 +98,4 @@ for client_pkg in packages_sorted:
         print(f"❌ Client {client_pkg} is not running.")
             
 asyncio.run(update_log_file(data_buffer))
+print(f"Log file Finished")
