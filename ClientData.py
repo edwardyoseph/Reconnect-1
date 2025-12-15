@@ -101,11 +101,4 @@ for client_pkg in packages_sorted:
     else:
         print(f"❌ Client {client_pkg} is not running.")
 
-# Verifikasi apakah data_buffer memiliki data yang valid
-if data_buffer:
-    print("Data buffer contains valid entries.")
-    asyncio.run(update_log_file(data_buffer))
-else:
-    print("No data to write to log.")
-
-print(f"Log file finished")
+update_log_file(data_buffer)
