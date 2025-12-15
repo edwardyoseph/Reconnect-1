@@ -32,11 +32,39 @@ data_buffer = {}
 # Log file path
 log_file_path = "/storage/emulated/0/Reconnect/log.txt"
 
-def run_adb_command(command):
-    # Runs adb command and returns the result
-    result = subprocess.run(f"adb shell {command}", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    return result.stdout.decode("utf-8")
+# Function to read the log file and populate data_buffer
+def parse_log_file():
+    global data_buffer
+    try:
+        with open(log_file_path, 'r') as file:
+            lines = file.readlines()
+            user_data = {}
+            for line in lines:
+                if "Username:" in line:
+                    username = line.split(":")[1].strip()
+                elif "UserId:" in line:
+                    user_id = line.split(":")[1].strip()
+                elif "PID:" in line:
+                    pid = line.split(":")[1].strip()
+                elif "ClientName:" in line:
+                    client_name = line.split(":")[1].strip()
+                elif "Status:" in line:
+                    status = line.split(":")[1].strip()
+                    # Add the data to buffer
+                    user_data = {
+                        "username": username,
+                        "user_id": user_id,
+                        "pid": pid,
+                        "client_name": client_name,
+                        "status": status
+                    }
+                    data_buffer[username] = user_data
+    except FileNotFoundError:
+        print("❌ Log file not found.")
+    except Exception as e:
+        print(f"Error parsing log file: {e}")
 
+# Function to get the status of a user from Roblox API
 def get_user_status(user_id):
     try:
         url = "https://presence.roblox.com/v1/presence/users"
@@ -69,16 +97,23 @@ def get_user_status(user_id):
         print(f"Error fetching user status: {e}")
         return "Offline"
 
+# Function to update only the status in the data buffer
+def update_status_in_buffer():
+    global data_buffer
+    for username, user_data in data_buffer.items():
+        updated_status = get_user_status(user_data["user_id"])
+        if updated_status != user_data["status"]:
+            print(f"Status updated for {user_data['username']} from {user_data['status']} to {updated_status}")
+            user_data["status"] = updated_status  # Update the status in the buffer
+
+# Function to get device usage (CPU, RAM)
 def get_device_usage():
-    # CPU percentage
     cpu_usage = psutil.cpu_percent(interval=1)
 
-    # RAM usage (bytes)
     mem = psutil.virtual_memory()
     total_gb = mem.total / (1024 ** 3)
     used_gb = (mem.total - mem.available) / (1024 ** 3)
 
-    # Format ke 2 decimal
     total_gb = f"{total_gb:.2f}GB"
     used_gb = f"{used_gb:.2f}GB"
 
@@ -90,13 +125,12 @@ def generate_bar(percent, length=18):
     return "█" * filled + "░" * empty
 
 def choose_color(cpu):
-    # Warna embed berdasarkan CPU load
     if cpu < 40:
-        return 5793266   # hijau-biru
+        return 5793266   # green-blue
     elif cpu < 70:
-        return 16753920  # kuning
+        return 16753920  # yellow
     else:
-        return 15158332  # merah
+        return 15158332  # red
 
 def send_to_webhook(data):
     if not WEBHOOK_URL:
@@ -105,9 +139,8 @@ def send_to_webhook(data):
 
     cpu, ram_used, ram_total = get_device_usage()
 
-    # Hitung RAM usage dalam persen
-    ram_used_float = float(ram_used.replace("GB",""))
-    ram_total_float = float(ram_total.replace("GB",""))
+    ram_used_float = float(ram_used.replace("GB", ""))
+    ram_total_float = float(ram_total.replace("GB", ""))
     ram_percent = (ram_used_float / ram_total_float) * 100
 
     cpu_bar = generate_bar(cpu)
@@ -181,23 +214,16 @@ async def update_log_file(data):
             await log_file.write(f"Status: {user_data['status']}\n")
             await log_file.write("-" * 50 + "\n")
 
-# Kirim semua data ke webhook Discord dalam satu embed jika data_buffer ada
-if data_buffer:
-    send_to_webhook(data_buffer)
-
-# Loop untuk cek status setiap 5 detik, update log file, dan kirim data ke log
-last_sent_time = time.time()
+# Function to run the status update loop
 async def status_update_loop():
-    global last_sent_time
+    global data_buffer
+    parse_log_file()  # Read the log file at the start
+    last_sent_time = time.time()
+
     while True:
         await asyncio.sleep(30)  # Wait for 30 seconds before updating status
 
-        # Update user status
-        for user, data in data_buffer.items():
-            updated_status = get_user_status(data["user_id"])
-            if updated_status != data["status"]:
-                print(f"Status updated for {data['username']} from {data['status']} to {updated_status}")
-                data["status"] = updated_status
+        update_status_in_buffer()  # Update user status in the buffer
 
         # Update the log file
         await update_log_file(data_buffer)
@@ -207,5 +233,4 @@ async def status_update_loop():
             send_to_webhook(data_buffer)  # Send the updated data to Discord webhook
             last_sent_time = time.time()  # Update the last sent time
 
-# Mulai update status
-asyncio.run(status_update_loop())
+# Start
