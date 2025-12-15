@@ -22,7 +22,7 @@ while true; do
         if [ "$STATUS" = "Offline" ]; then
             echo "[OFFLINE] Restart Roblox + Join PS"
             
-            adb shell am force-stop -p "$CLIENT"
+            adb shell am force-stop "$CLIENT"
             sleep 5
 
             am start -n "$CLIENT/$ACT"
