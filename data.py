@@ -144,7 +144,7 @@ def send_to_webhook(data):
     r = requests.post(WEBHOOK_URL, json=payload)
 
     if r.status_code == 204:
-        print("✔ Embed sent successfully.")
+        print("✅ Embed sent successfully.")
         time.sleep(2)
         print("⏳ Waiting for next update...")
     else:
@@ -152,7 +152,7 @@ def send_to_webhook(data):
 
 # Function to open Roblox and join private server using package name and private server link
 def open_roblox(pkg):
-    print(f"Opening Roblox with package: {pkg}...")
+    print(f"⏳ Opening Roblox with package: {pkg}...")
 
     # Open Roblox application with adb command
     run_adb_command(f"am start -n {pkg}/com.roblox.client.startup.ActivitySplash")
