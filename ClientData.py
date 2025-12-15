@@ -4,7 +4,7 @@ import requests
 import time
 
 data_buffer = {}
-log_file_path = "/sdcard/Reconnect/log.txt"
+log_file_path = "/sdcard/log.txt"
 
 # Pastikan folder /sdcard/Reconnect/ ada
 os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
