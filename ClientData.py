@@ -6,15 +6,12 @@ import time
 data_buffer = {}
 log_file_path = "/storage/emulated/0/Reconnect/log.txt"
 
-# Pastikan folder /sdcard/Reconnect/ ada
 os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
 
-# Fungsi untuk menjalankan perintah adb
 def run_adb_command(command):
     result = subprocess.run(f"adb shell {command}", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return result.stdout.decode("utf-8")
 
-# Fungsi untuk mengambil status pengguna
 def get_user_status(user_id):
     try:
         url = "https://presence.roblox.com/v1/presence/users"
@@ -42,15 +39,13 @@ def get_user_status(user_id):
     except Exception as e:
         return "Offline"
 
-# Fungsi untuk membuka aplikasi Roblox
 def open_roblox(pkg):
     print(f"⏳ Opening Roblox with package: {pkg}...")
     run_adb_command(f"am start -n {pkg}/com.roblox.client.startup.ActivitySplash")
     time.sleep(15)
 
-# Fungsi untuk menulis log file dengan cara biasa (bukan asinkron)
 def update_log_file(data):
-    with open(log_file_path, 'a') as log_file:
+    with open(log_file_path, 'w') as log_file:
         for user, user_data in data.items():
             log_file.write(f"Username: {user_data['username']}\n")
             log_file.write(f"UserId: {user_data['user_id']}\n")
@@ -92,7 +87,6 @@ for client_pkg in packages_sorted:
             if username and user_id:
                 status = get_user_status(user_id)
                 print(f"⭐ Found - Username: {username}, UserId: {user_id}, Status: {status}")
-                # Menambahkan data ke data_buffer
                 data_buffer[username] = {
                     "username": username,
                     "user_id": user_id,
@@ -105,7 +99,6 @@ for client_pkg in packages_sorted:
     else:
         print(f"❌ Client {client_pkg} is not running.")
 
-# Verifikasi apakah data_buffer memiliki data yang valid sebelum menulis ke log
 if data_buffer:
     print(f"Data buffer contains {len(data_buffer)} entries.")
     update_log_file(data_buffer)
